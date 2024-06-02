@@ -58,16 +58,16 @@ class Cart:
         else:
             self.products[product] += quantity
 
-    def remove_product(self, product: Product, quantity=None):
+    def remove_product(self, product: Product, quantity=None, remove_count=None):
         """
         Метод удаления продукта из корзины.
         Если remove_count не передан, то удаляется вся позиция
         Если remove_count больше, чем количество продуктов в позиции, то удаляется вся позиция
         """
-        if product in self.products and quantity is None:
-            self.products.pop(product)
-        elif product in self.products and quantity > product.quantity:
-            self.products.pop(product)
+        if remove_count is None or remove_count > self.products[product]:
+            del self.products[product]
+        else:
+            self.products[product] -= remove_count
 
     def clear(self):
         self.products.clear()
@@ -81,5 +81,10 @@ class Cart:
         Учтите, что товаров может не хватать на складе.
         В этом случае нужно выбросить исключение ValueError
         """
-        for product in self.products:
-            product.buy(product)
+        for product, quantity in self.products.items():
+            if not product.check_quantity(quantity):
+                raise ValueError
+            else:
+                product.quantity -= quantity
+
+        self.clear()

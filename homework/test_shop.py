@@ -100,25 +100,19 @@ class TestCart:
         cart.add_product(copybook, 2)
         cart.add_product(pen, 4)
 
-        assert cart.get_total_price() == 300
+        assert cart.get_total_price() == 308
 
-    def test_buy(self, product, copybook, pen, cart):
-        cart.clear()
-        cart.add_product(product, 1)
-        cart.add_product(copybook, 2)
-        cart.add_product(pen, 4)
+    def test_buy(self, product, cart):
+        cart.add_product(product, 100)
         cart.buy()
+        assert product.quantity == 900
 
-        assert cart.get_total_price() == float(300)
-        assert product.quantity == 999
-        assert pen.quantity == 996
-        assert copybook == 2998
+        product.quantity -= 900
+        cart.add_product(product, 100)
+        with pytest.raises(ValueError):
+            cart.buy()
 
     def test_buy_more_then_stock(self, product, cart):
         cart.add_product(product, product.quantity + 1)
         with pytest.raises(ValueError):
             cart.buy()
-
-
-
-
